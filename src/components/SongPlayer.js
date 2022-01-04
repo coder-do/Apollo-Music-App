@@ -1,6 +1,7 @@
-import { PlayArrow, SkipNext, SkipPrevious } from '@material-ui/icons';
-import React from 'react';
+import { Pause, PlayArrow, SkipNext, SkipPrevious } from '@material-ui/icons';
+import React, { useContext } from 'react';
 import QueuedSongList from './QueuedSongList';
+import { SongContext } from '../App';
 import {
     Card,
     CardContent,
@@ -9,7 +10,8 @@ import {
     Slider,
     Typography,
     makeStyles,
-    useMediaQuery
+    useMediaQuery,
+    Tooltip
 } from '@material-ui/core';
 
 const useStyle = makeStyles(theme => ({
@@ -42,7 +44,13 @@ const useStyle = makeStyles(theme => ({
 
 const SongPlayer = () => {
     const cls = useStyle();
+    const { state, dispatch } = useContext(SongContext);
     const mediaScreen = useMediaQuery(theme => theme.breakpoints.up('md'));
+
+    const handlePlay = () => {
+        dispatch(state.isPlaying ? { type: 'TOGGLE_PAUSE' } : { type: 'TOGGLE_PLAY' })
+    }
+
     return (
         <>
             <Card
@@ -53,23 +61,39 @@ const SongPlayer = () => {
                 <div className={cls.details}>
                     <CardContent>
                         <Typography variant='h5' component='h3'>
-                            Title
+                            {state.song.title}
                         </Typography>
                         <Typography variant='subtitle1' component='p' color='textSecondary'>
-                            Artist
+                            {state.song.artist}
                         </Typography>
                     </CardContent>
                     <div className={cls.controls}>
-                        <IconButton >
-                            <SkipPrevious />
-                        </IconButton>
-                        <IconButton>
-                            <PlayArrow className={cls.playIcon} />
-                        </IconButton>
-                        <IconButton>
-                            <SkipNext />
-                        </IconButton>
-                        <Typography variant='subtitle1' component='p' color='textSecondary'>
+                        <Tooltip title='Previous' arrow>
+                            <IconButton >
+                                <SkipPrevious />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Play' arrow>
+                            <IconButton onClick={handlePlay}>
+                                {
+                                    state.isPlaying ?
+                                        <Pause className={cls.playIcon} />
+                                        :
+                                        <PlayArrow className={cls.playIcon} />
+                                }
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Next' arrow>
+                            <IconButton>
+                                <SkipNext />
+                            </IconButton>
+                        </Tooltip>
+                        <Typography
+                            component='p'
+                            variant='subtitle1'
+                            color='textSecondary'
+                            style={{ userSelect: 'none' }}
+                        >
                             00:03:45
                         </Typography>
                     </div>
@@ -82,7 +106,7 @@ const SongPlayer = () => {
                 </div>
                 <CardMedia
                     className={cls.thumbnail}
-                    image='http://i3.ytimg.com/vi/O8vICMWyP_Q/hqdefault.jpg'
+                    image={state.song.image}
                 />
             </Card>
             <QueuedSongList />

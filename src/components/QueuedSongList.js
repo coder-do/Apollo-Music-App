@@ -1,4 +1,4 @@
-import { Avatar, IconButton, Typography, makeStyles, useMediaQuery } from '@material-ui/core';
+import { Avatar, IconButton, Typography, makeStyles, useMediaQuery, Tooltip } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import React from 'react';
 
@@ -71,9 +71,11 @@ const QueuedSong = ({ song }) => {
                     {artist}
                 </Typography>
             </div>
-            <IconButton>
-                <Delete color='error' />
-            </IconButton>
+            <Tooltip title='Remove from queue' arrow>
+                <IconButton>
+                    <Delete color='error' />
+                </IconButton>
+            </Tooltip>
         </div>
     )
 }

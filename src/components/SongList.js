@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { GET_SONGS } from '../graphql/subscriptions';
+import { useSubscription } from '@apollo/react-hooks';
 import { PlayArrow, Save } from '@material-ui/icons';
 import {
     Card,
@@ -8,11 +10,12 @@ import {
     CircularProgress,
     IconButton,
     Typography,
-    makeStyles
+    makeStyles,
+    Tooltip
 } from '@material-ui/core';
 
 const SongList = () => {
-    const [loading, setLoading] = useState(false);
+    const { data, loading, error } = useSubscription(GET_SONGS);
 
     const song = {
         title: 'Сижу я на травке',
@@ -33,9 +36,11 @@ const SongList = () => {
         )
     }
     return (
-        <div>{Array.from({ length: 10 }, () => song).map((elem, ind) => (
-            <Song key={ind} song={elem} />
-        ))}</div>
+        <div>
+            {data.songs.map(song => (
+                <Song key={song.id} song={song} />
+            ))}
+        </div>
     )
 }
 
@@ -61,11 +66,11 @@ const useStyle = makeStyles(theme => ({
 
 const Song = ({ song }) => {
     const cls = useStyle();
-    const { title, artist, thumbnail } = song;
+    const { title, artist, image } = song;
     return (
         <Card className={cls.container}>
             <div className={cls.songInfoContainer}>
-                <CardMedia className={cls.thumbnail} image={thumbnail} />
+                <CardMedia className={cls.thumbnail} image={image} />
                 <div className={cls.songInfo}>
                     <CardContent>
                         <Typography gutterBottom variant='h5' component='h2'>
@@ -76,12 +81,16 @@ const Song = ({ song }) => {
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <IconButton size='small' color='primary'>
-                            <PlayArrow />
-                        </IconButton>
-                        <IconButton size='small' color='secondary'>
-                            <Save />
-                        </IconButton>
+                        <Tooltip title='Play' arrow>
+                            <IconButton size='small' color='primary'>
+                                <PlayArrow />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Add to queue' arrow>
+                            <IconButton size='small' color='secondary'>
+                                <Save />
+                            </IconButton>
+                        </Tooltip>
                     </CardActions>
                 </div>
             </div>
