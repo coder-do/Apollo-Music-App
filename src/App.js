@@ -16,7 +16,7 @@ export const SongContext = createContext({
         duration: 159.7,
         created_at: "2022-01-04T11:41:51.879222+00:00"
     },
-    isPlaying: false
+    isPlaying: true
 })
 
 function App() {

@@ -19,12 +19,6 @@ import {
 const SongList = () => {
     const { data, loading } = useSubscription(GET_SONGS);
 
-    const song = {
-        title: 'Сижу я на травке',
-        artist: 'Blatnoy Udar',
-        thumbnail: 'http://i3.ytimg.com/vi/O8vICMWyP_Q/hqdefault.jpg'
-    }
-
     if (loading) {
         return (
             <div style={{
@@ -84,14 +78,14 @@ const Song = ({ song }) => {
 
     const handlePlay = () => {
         dispatch({ type: 'SET_SONG', payload: { song } })
-        dispatch(state.isPlaying ? { type: 'TOGGLE_PAUSE' } : { type: 'TOGGLE_PLAY' })
-    }
+        dispatch(!state.isPlaying ? { type: 'TOGGLE_PAUSE' } : { type: 'TOGGLE_PLAY' })
+    };
 
     const handleAddRemoveToQueue = () => {
         addOrRemove({
             variables: { input: { ...song, __typename: 'Song' } }
-        })
-    }
+        });
+    };
 
     return (
         <Card className={cls.container}>
