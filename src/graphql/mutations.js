@@ -7,4 +7,10 @@ export const ADD_SONG = gql`
             affected_rows
         }
     }
+`;
+
+export const ADD_REMOVE_SONG = gql`
+    mutation addOrRemove($input: SongInput!) {
+        addOrRemove(input: $input) @client
+    }
 `

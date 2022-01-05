@@ -8,13 +8,13 @@ import { songReducer } from './reducer';
 
 export const SongContext = createContext({
     song: {
-        id: "26099b64-2d2d-4591-a157-b0060f052f3b",
-        title: "✵Сижу я на травке✵",
-        artist: "Blatnoy Udar",
-        image: "http://img.youtube.com/vi/O8vICMWyP_Q/0.jpg",
-        url: "https://www.youtube.com/watch?v=O8vICMWyP_Q&t=198s",
-        duration: 455,
-        created_at: "2022-01-04T12:24:33.183768+00:00"
+        id: "7c8e4045-9e4e-4d64-852f-9d4f6ef0f397",
+        title: "Making All Things New",
+        artist: "dougwaterman",
+        image: "https://i1.sndcdn.com/artworks-000046345510-6qi96p-t500x500.jpg",
+        url: "https://soundcloud.com/user-961145082/sets/as-beautiful-as-it-sounds",
+        duration: 159.7,
+        created_at: "2022-01-04T11:41:51.879222+00:00"
     },
     isPlaying: false
 })

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { GET_SONGS } from '../graphql/subscriptions';
-import { useSubscription } from '@apollo/react-hooks';
-import { PlayArrow, Save } from '@material-ui/icons';
+import { SongContext } from '../App';
+import { ADD_REMOVE_SONG } from '../graphql/mutations';
+import { useMutation, useSubscription } from '@apollo/react-hooks';
+import { Pause, PlayArrow, Save } from '@material-ui/icons';
 import {
     Card,
     CardActions,
@@ -15,7 +17,7 @@ import {
 } from '@material-ui/core';
 
 const SongList = () => {
-    const { data, loading, error } = useSubscription(GET_SONGS);
+    const { data, loading } = useSubscription(GET_SONGS);
 
     const song = {
         title: 'Сижу я на травке',
@@ -65,8 +67,32 @@ const useStyle = makeStyles(theme => ({
 }))
 
 const Song = ({ song }) => {
+    const { state, dispatch } = useContext(SongContext);
+    const [songPlaying, setSongPlaying] = useState(false);
+    const [addOrRemove] = useMutation(ADD_REMOVE_SONG, {
+        onCompleted: data => {
+            localStorage.setItem('queue', JSON.stringify(data.addOrRemove))
+        }
+    });
     const cls = useStyle();
-    const { title, artist, image } = song;
+    const { id, title, artist, image } = song;
+
+    useEffect(() => {
+        const plays = state.isPlaying && id === state.song.id;
+        setSongPlaying(plays);
+    }, [id, state.song.id, state.isPlaying]);
+
+    const handlePlay = () => {
+        dispatch({ type: 'SET_SONG', payload: { song } })
+        dispatch(state.isPlaying ? { type: 'TOGGLE_PAUSE' } : { type: 'TOGGLE_PLAY' })
+    }
+
+    const handleAddRemoveToQueue = () => {
+        addOrRemove({
+            variables: { input: { ...song, __typename: 'Song' } }
+        })
+    }
+
     return (
         <Card className={cls.container}>
             <div className={cls.songInfoContainer}>
@@ -81,13 +107,26 @@ const Song = ({ song }) => {
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <Tooltip title='Play' arrow>
-                            <IconButton size='small' color='primary'>
-                                <PlayArrow />
+                        <Tooltip title='Play' placement='top' arrow>
+                            <IconButton
+                                size='small'
+                                color='primary'
+                                onClick={handlePlay}
+                            >
+                                {
+                                    songPlaying ?
+                                        <Pause className={cls.playIcon} />
+                                        :
+                                        <PlayArrow className={cls.playIcon} />
+                                }
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title='Add to queue' arrow>
-                            <IconButton size='small' color='secondary'>
+                        <Tooltip title='Add to queue' placement='top' arrow>
+                            <IconButton
+                                size='small'
+                                color='secondary'
+                                onClick={handleAddRemoveToQueue}
+                            >
                                 <Save />
                             </IconButton>
                         </Tooltip>

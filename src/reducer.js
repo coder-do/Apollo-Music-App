@@ -9,11 +9,17 @@ const songReducer = (state, action) => {
             return {
                 ...state,
                 isPlaying: true
-            }
+            };
         case 'TOGGLE_PAUSE':
             return {
                 ...state,
                 isPlaying: false
+            };
+        case 'SET_SONG':
+            return {
+                ...state,
+                song: action.payload.song,
+                isPlaying: true
             }
         default:
             return state;

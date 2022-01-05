@@ -1,27 +1,8 @@
+import { useMutation } from '@apollo/react-hooks';
 import { Avatar, IconButton, Typography, makeStyles, useMediaQuery, Tooltip } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import React from 'react';
-
-const QueuedSongList = () => {
-    const mediumScreen = useMediaQuery(theme => theme.breakpoints.up('md'));
-
-    const song = {
-        title: 'Сижу я на травке',
-        artist: 'Blatnoy Udar',
-        thumbnail: 'http://i3.ytimg.com/vi/O8vICMWyP_Q/hqdefault.jpg'
-    }
-
-    return mediumScreen && (
-        <div style={{ margin: '10px 0' }}>
-            <Typography color='textSecondary' variant='button'>
-                QUEUE (5)
-            </Typography>
-            {Array.from({ length: 5 }, () => song).map((song, i) => (
-                <QueuedSong key={i} song={song} />
-            ))}
-        </div>
-    )
-};
+import { ADD_REMOVE_SONG } from '../graphql/mutations';
 
 const useStyle = makeStyles(() => ({
     avatar: {
@@ -46,13 +27,41 @@ const useStyle = makeStyles(() => ({
     }
 }))
 
+const QueuedSongList = ({ queue }) => {
+    const mediumScreen = useMediaQuery(theme => theme.breakpoints.up('md'));
+
+    return mediumScreen && (
+        <div style={{ margin: '10px 0' }}>
+            <Typography color='textSecondary' variant='button'>
+                QUEUE ({queue.queue.length})
+            </Typography>
+            {queue.queue.map((song, i) => (
+                <QueuedSong key={i} song={song} />
+            ))}
+        </div>
+    )
+};
+
+
 const QueuedSong = ({ song }) => {
     const cls = useStyle();
-    const { title, artist, thumbnail } = song;
+    const { title, artist, image } = song;
+    const [addOrRemove] = useMutation(ADD_REMOVE_SONG, {
+        onCompleted: data => {
+            localStorage.setItem('queue', JSON.stringify(data.addOrRemove))
+        }
+    });
+
+    const handleAddRemoveToQueue = () => {
+        addOrRemove({
+            variables: { input: { ...song, __typename: 'Song' } }
+        })
+    }
+
     return (
         <div className={cls.container}>
             <Avatar
-                src={thumbnail}
+                src={image}
                 className={cls.avatar}
                 alt='song avatar'
             />
@@ -72,9 +81,11 @@ const QueuedSong = ({ song }) => {
                 </Typography>
             </div>
             <Tooltip title='Remove from queue' arrow>
-                <IconButton>
-                    <Delete color='error' />
-                </IconButton>
+                <div style={{ width: '65px', margin: '0 auto' }}>
+                    <IconButton onClick={handleAddRemoveToQueue} >
+                        <Delete color='error' />
+                    </IconButton>
+                </div>
             </Tooltip>
         </div>
     )
